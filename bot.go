@@ -43,23 +43,26 @@ func main() {
 	}
 
 	for {
-		guildMembers, err := discord.GuildMembers(ourGuildID, "0", 1000)
-		if err != nil {
-			log.Println("Failed to get guild")
-			return
-		}
-
-		for _, member := range guildMembers {
-			if member.User.Bot {
-				continue
-			}
-
-			id := member.User.ID
-			_, err := sendDirectMessage(discord, id, gameMessage)
+		go func() {
+			guildMembers, err := discord.GuildMembers(ourGuildID, "0", 1000)
 			if err != nil {
-				log.Println(err.Error())
+				log.Println("Failed to get guild")
+				return
 			}
-		}
+
+			for _, member := range guildMembers {
+				if member.User.Bot {
+					continue
+				}
+
+				id := member.User.ID
+				_, err := sendDirectMessage(discord, id, gameMessage)
+				if err != nil {
+					log.Println(err.Error())
+				}
+			}
+		}()
+
 		time.Sleep(time.Minute * 30)
 	}
 }
